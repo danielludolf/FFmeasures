@@ -17,6 +17,8 @@
 
 pums_recode <- function(data){
 
+  message("Make sure to make a column titled 'year' before using pums_recode()")
+
   data %>%
     # Age Group Recode
     mutate(`Age Group` = tryCatch(cut(as.numeric(AGEP), breaks = c(0, 18, 35, 65, Inf),
