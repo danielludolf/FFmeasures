@@ -13,8 +13,7 @@ pums_recode(data)
 This function recodes the ACS' PUMS variables to match Forsyth Futures' labeling standards
 }
 \details{
-# Warning
-Make sure to make a column titled 'year' before using pums_recode()
+Warning: Make sure to make a column titled 'year' before using pums_recode()
 }
 \examples{
  year <- 2019

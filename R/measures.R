@@ -1,8 +1,7 @@
 #' Recode ACS' PUMS Datasets to Forsyth Futures' Labeling
 #'
 #' This function recodes the ACS' PUMS variables to match Forsyth Futures' labeling standards
-#' @details # Warning
-#' Make sure to make a column titled 'year' before using pums_recode()
+#' @details Warning: Make sure to make a column titled 'year' before using pums_recode()
 #' @param data The PUMS dataset object
 #' @keywords pums_recode
 #' @export
