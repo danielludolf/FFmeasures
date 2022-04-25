@@ -4,7 +4,7 @@ Title: Forsyth Futures Measures
 Version: 0.1.0
 Author: Daniel Ludolf
 Maintainer: Daniel Ludolf <daniel@forsythfutures.org>
-Description:  
+Description: 
     The FFmeasures package provides Forsyth Futures analysts an easier way
     to compute commonly requested and used community measures.
 License: MIT
@@ -12,3 +12,4 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/danielludolf/FFmeasures
 BugReports: https://github.com/danielludolf/FFmeasures/issues
+RoxygenNote: 7.1.2

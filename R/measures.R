@@ -1,3 +1,100 @@
+#' Recode ACS' PUMS Datasets to Forsyth Futures' Labeling
+#'
+#' This function recodes the ACS' PUMS variables to match Forsyth Futures' labeling standards
+#' @details # Warning
+#' Make sure to make a column titled 'year' before using pums_recode()
+#' @param data The PUMS dataset object
+#' @keywords pums_recode
+#' @export
+#' @importFrom magrittr "%>%"
+#' @examples
+#'  year <- 2019
+#'  tidycensus::get_pums(variables = c("RAC1P","HISP","SEX","POVPIP","AGEP","SCHL"), state = "NC", puma = c("01801","01802","01803"),
+#'           year = year, survey = "acs1", rep_weights = "person") %>%
+#'    dplyr::rename_all(~str_to_upper(.x)) %>%
+#'    # Make sure to make a column titled 'year' before using pums_recode()
+#'    dplyr::mutate(year = year) %>%
+#'    pums_recode()
+
+pums_recode <- function(data){
+
+  data %>%
+    # Age Group Recode
+    mutate(`Age Group` = tryCatch(cut(as.numeric(AGEP), breaks = c(0, 18, 35, 65, Inf),
+                                      labels = c("Under 18 years old", "18-34 years old", "35-64 years old", "65+ years old"), right = FALSE),
+                                  error = function(e) NULL),
+    # Race/Ethnicity Recode
+           `Race/Ethnicity` = tryCatch(ifelse(as.numeric(HISP) > 1, "Hispanic/Latino",
+                                              ifelse(as.numeric(RAC1P) == 1, "White, NH",
+                                                     ifelse(as.numeric(RAC1P) ==2, "Black/AA, NH",
+                                                            NA_character_))),
+                                       error = function(e) NULL),
+    # Sex Recode
+            Sex = tryCatch(ifelse(as.numeric(SEX) == 1, "Male", "Female"),
+                           error = function(e) NULL),
+    # Sex of Adults Recode
+           `Sex of Adults` = tryCatch(ifelse(as.numeric(AGEP) < 18, NA_character_,
+                                             ifelse(as.numeric(SEX) == 1, "Male", "Female")),
+                                      error = function(e) NULL),
+    # Associate's Degree or More Recode
+           `Educational Attainment` = tryCatch(ifelse(AGEP <= 24 | is.na(AGEP), NA_character_,
+                                                      ifelse(as.numeric(SCHL) >= 20, "Associate's Degree or More", "Less than Associate's Degree")),
+                                               error = function(e) NULL),
+    # Highest Level of Educational Attainment Recode
+           `Highest Level of Educational Attainment` = tryCatch(ifelse(as.numeric(AGEP) >= 25 & year < 2008,
+                                                                       as.character(cut(as.numeric(SCHL),
+                                                                                        breaks = c(0, 9, 12, 13, 14, Inf),
+                                                                                        labels = c("High School Diploma or Less",
+                                                                                                   "Some College, No Degree",
+                                                                                                   "Associate's Degree",
+                                                                                                   "Bachelor's Degree",
+                                                                                                   "More than a Bachelor's Degree"), right = FALSE)), NA_character_),
+                                                                error = function(e) NULL),
+    # Highest Level of Educational Attainment
+           `Highest Level of Educational Attainment` = tryCatch(ifelse(as.numeric(AGEP) >= 25 & year > 2007,
+                                                                       as.character(cut(as.numeric(SCHL),
+                                                                                        breaks = c(0, 18, 20, 21, 22, Inf),
+                                                                                        labels = c("High School Diploma or Less",
+                                                                                                   "Some College, No Degree",
+                                                                                                   "Associate's Degree",
+                                                                                                   "Bachelor's Degree",
+                                                                                                   "More than a Bachelor's Degree"), right = FALSE)), NA_character_),
+                                                                error = function(e) NULL),
+    # County Recode
+           `County` = tryCatch(ifelse(year < 2012, dplyr::case_when(
+                                                     PUMA == `1800` ~ "Forsyth County, NC",
+                                                     PUMA == `1900` ~ "Forsyth County, NC",
+                                                     PUMA == `1601` ~ "Guilford County, NC",
+                                                     PUMA == `1602` ~ "Guilford County, NC",
+                                                     PUMA == `1700` ~ "Guilford County, NC",
+                                                     PUMA == `2801` ~ "Durham County, NC",
+                                                     PUMA == `2802` ~ "Durham County, NC",
+                                                     TRUE ~ NA_character_)),
+             error = function(e) NULL),
+    # County Recode
+           `County` = tryCatch(ifelse(year > 2011, dplyr::case_when(
+                                                     PUMA == `1801` ~ "Forsyth County, NC",
+                                                     PUMA == `1802` ~ "Forsyth County, NC",
+                                                     PUMA == `1803` ~ "Forsyth County, NC",
+                                                     PUMA == `1701` ~ "Guilford County, NC",
+                                                     PUMA == `1702` ~ "Guilford County, NC",
+                                                     PUMA == `1703` ~ "Guilford County, NC",
+                                                     PUMA == `1704` ~ "Guilford County, NC",
+                                                     PUMA == `1301` ~ "Durham County, NC",
+                                                     PUMA == `1302` ~ "Durham County, NC",
+                                                     TRUE ~ NA_character_)),
+             error = function(e) NULL),
+    # Poverty Recode
+           Poverty = tryCatch(dplyr::case_when(
+                               POVPIP < 100 ~ "Below 100% FPL",
+                               dplyr::between(POVPIP, 100, 200) ~ "Between 100-200% FPL",
+                               POVPIP > 200 ~ "Above 200% FPL",
+                               TRUE ~ NA_character_),
+             error = function(e) NULL)
+    )
+
+}
+
 
 # helper function for the volunteerism function
 percent_moe_calc <- function(parameter_b, population, percentage){
@@ -70,9 +167,7 @@ volunteerism <- function(year, CENSUS_KEY){
 }
 
 # f510269e416c08d666d3c2213ec475b675ea29f7
-volunteerism(2019, 'f510269e416c08d666d3c2213ec475b675ea29f7') %>%
+volunteerism(2016, 'f510269e416c08d666d3c2213ec475b675ea29f7') %>%
   adjust_row_order(c(2,1,3))
-
-
 
 
