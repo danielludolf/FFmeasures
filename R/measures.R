@@ -95,6 +95,12 @@ pums_recode <- function(data){
 
 }
 
+# adjust rows how the user desires
+adjust_row_order <- function(data_frame, row_order){
+
+  data_frame[c(row_order),]
+
+}
 
 # helper function for the volunteerism function
 percent_moe_calc <- function(parameter_b, population, percentage){
