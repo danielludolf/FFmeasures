@@ -103,6 +103,7 @@ percent_moe_calc <- function(parameter_b, population, percentage){
 
 }
 
+#' @importFrom magrittr "%>%"
 volunteerism <- function(year){
 
   # TODO 2002 has different variable names
@@ -160,8 +161,8 @@ volunteerism <- function(year){
 
 }
 
-volunteerism(2019) %>%
-  adjust_row_order(c(2,1,3))
+# volunteerism(2019) %>%
+#   adjust_row_order(c(2,1,3))
 
 #' Install a CENSUS API Key in Your .Renviron File for Repeated Use
 #'
