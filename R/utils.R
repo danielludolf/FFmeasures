@@ -1,7 +1,7 @@
 
 # adjust rows how the user desires
-adjust_row_order <- function(data_frame, row_order){
+select_rows <- function(data_frame, row_vector){
 
-  data_frame[c(row_order),]
+  data_frame[row_vector,]
 
 }
