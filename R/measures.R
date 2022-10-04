@@ -87,7 +87,7 @@ pums_recode <- function(data){
              error = function(e) NULL),
     # Poverty Recode
            Poverty = tryCatch(dplyr::case_when(
-                               POVPIP == -1 ~ NA,
+                               POVPIP == -1 ~ NA_character_,
                                dplyr::between(POVPIP, 0, 99) ~ "Below 100% FPL",
                                dplyr::between(POVPIP, 100, 200) ~ "Between 100-200% FPL",
                                POVPIP > 200 ~ "Above 200% FPL",
